@@ -189,7 +189,7 @@ tr:hover td{background:#fefdf9}
       <div class="sb-group">EŞLEŞTİR</div>
       <button class="sb-item" onclick="goPage('eslestir',this)"><span class="ico">🔔</span>Portföy ↔ Müşteri</button>
       <div class="sb-sep"></div>
-      <a class="sb-item" href="BSG_Emlak_Site.html" target="_blank"><span class="ico">🌐</span>Siteyi Görüntüle</a>
+      <a class="sb-item" href="https://croket16.github.io/bsg-emlak/" target="_blank"><span class="ico">🌐</span>Siteyi Görüntüle</a>
     </div>
     <div class="sb-foot"><button onclick="logout()">🚪 Çıkış Yap</button></div>
   </div>
@@ -332,6 +332,20 @@ tr:hover td{background:#fefdf9}
               </div>
             </div>
             <div class="img-preview-grid" id="imgPreviews"></div>
+            
+            <div style="margin-top:16px">
+              <div style="font-size:.7rem;font-weight:700;color:var(--gray);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">🎬 VİDEO (İsteğe Bağlı)</div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <div style="flex:1">
+                  <input type="url" id="fVideo" placeholder="YouTube veya video linki (https://youtube.com/watch?v=...)" 
+                    style="width:100%;border:1.5px solid #e2e0da;border-radius:6px;padding:9px 12px;font-family:'Inter',sans-serif;font-size:.85rem;outline:none;color:var(--navy)">
+                </div>
+              </div>
+              <div id="videoOnizleme" style="margin-top:10px;display:none">
+                <iframe id="videoFrame" style="width:100%;height:200px;border:none;border-radius:8px" allowfullscreen></iframe>
+              </div>
+              <p style="font-size:.73rem;color:var(--gray);margin-top:6px">💡 YouTube linkini yapıştır → video otomatik görünür</p>
+            </div>
             <div style="margin:16px 0">
               <label style="display:flex;align-items:center;gap:9px;cursor:pointer;font-size:.85rem;font-weight:500">
                 <input type="checkbox" id="fVitrin" style="width:15px;height:15px;accent-color:var(--gold)">
@@ -657,6 +671,7 @@ function saveIlan(){
     boylam:document.getElementById('fBoylam').value,
     aciklama:document.getElementById('fAciklama').value,
     ozel_not:document.getElementById('fOzelNot').value,
+    video:document.getElementById('fVideo')?document.getElementById('fVideo').value:'',
     vitrin:document.getElementById('fVitrin').checked,
     resimler:tumResimler,
     tarih:new Date().toLocaleDateString('tr-TR')
@@ -697,6 +712,7 @@ function editIlan(id){
   document.getElementById('fEnlem').value=il.enlem||'';
   document.getElementById('fBoylam').value=il.boylam||'';
   updateKonumOnizleme();
+  if(document.getElementById('fVideo'))document.getElementById('fVideo').value=il.video||'';
   document.getElementById('fTur').value=il.tur||'';
   document.getElementById('fDurum').value=il.durum||'';
   document.getElementById('fIsitma').value=il.isitma||'';
@@ -951,7 +967,7 @@ function eslestirMusteri(id){
 
 // ─── FORM HELPERS ───
 function resetForm(){
-  ['fBaslik','fFiyat','fKonum','fOda','fAlan','fKat','fBinaYasi','fAciklama','fOzelNot','fSahibi','fSahibiTel','fEnlem','fBoylam'].forEach(id=>{
+  ['fBaslik','fFiyat','fKonum','fOda','fAlan','fKat','fBinaYasi','fAciklama','fOzelNot','fSahibi','fSahibiTel','fEnlem','fBoylam','fVideo'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.value='';
   });
   ['fTur','fDurum','fIsitma','fEsya','fTapu'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
@@ -1066,6 +1082,28 @@ async function cloudinaryUpload(files) {
   setTimeout(() => { progress.style.display = 'none'; }, 2000);
   document.getElementById('fileInput2').value = '';
 }
+
+// Video önizleme
+document.addEventListener('input', function(e) {
+  if (e.target.id === 'fVideo') {
+    const url = e.target.value.trim();
+    const div = document.getElementById('videoOnizleme');
+    const frame = document.getElementById('videoFrame');
+    if (!url) { div.style.display = 'none'; return; }
+    
+    let embedUrl = '';
+    // YouTube
+    const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
+    if (ytMatch) embedUrl = 'https://www.youtube.com/embed/' + ytMatch[1];
+    
+    if (embedUrl) {
+      frame.src = embedUrl;
+      div.style.display = 'block';
+    } else {
+      div.style.display = 'none';
+    }
+  }
+});
 
 function updateKonumOnizleme(){
   const enlem=document.getElementById('fEnlem').value.trim();
